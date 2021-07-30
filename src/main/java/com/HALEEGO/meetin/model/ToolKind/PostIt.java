@@ -19,10 +19,10 @@ public class PostIt {
     private Long id;
 
     @Column(nullable = false)
-    private float locationX;
+    private double locationX;
 
     @Column(nullable = false)
-    private float locationY;
+    private double locationY;
 
     @Column
     private String postitCONTEXT;
