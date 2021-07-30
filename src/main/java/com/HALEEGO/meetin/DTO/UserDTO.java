@@ -21,5 +21,6 @@ public class UserDTO {
     private List<Room> rooms = new ArrayList<>();
 
     private int status;
+
     private String message;
 }
