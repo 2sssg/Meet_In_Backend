@@ -1,4 +1,4 @@
-package com.HALEEGO.meetin.controller;
+package com.HALEEGO.meetin.controller.MeetController;
 
 
 import com.HALEEGO.meetin.Constant.Enum.ErrorCode;
@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+
+import javax.websocket.server.PathParam;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class MeetController {
 
     @MessageMapping("/{roomID}/postit")
     @Transactional
-    public void temp(PostItDTO postItDTO , UserDTO userDTO , @PathVariable("roomID") int roomID ){
+    public void temp(PostItDTO postItDTO , UserDTO userDTO , @PathParam("roomID") int roomID ){
         JSONObject returnObj = new JSONObject();
 
         returnObj.put("postit" , postItDTO);
