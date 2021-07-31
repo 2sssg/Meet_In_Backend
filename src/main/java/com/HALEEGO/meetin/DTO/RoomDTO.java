@@ -16,12 +16,19 @@ import java.util.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoomDTO {
-
     private Long id;
+
     private int roomID;
+
     private UserDTO hostUSER;
+
     private MeetType meetType;
+
     private List<Six_hatDTO> six_hats = new ArrayList<>();
+
+    private List<UserDTO> users = new ArrayList<>();
+
     private int status;
+
     private String message;
 }

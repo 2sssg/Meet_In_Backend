@@ -20,10 +20,11 @@ public class Six_hatDTO {
 
     private Enum<MeetStep> meetSTEP;
 
-//    private ToolDTO tool;
+    private ToolDTO tool;
 
     private RoomDTO room;
 
     private int status;
+
     private String message;
 }

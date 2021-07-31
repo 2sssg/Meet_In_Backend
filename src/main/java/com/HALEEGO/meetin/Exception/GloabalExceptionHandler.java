@@ -54,4 +54,28 @@ public class GloabalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(AlreadyStartMeetException.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final AlreadyStartMeetException e){
+        LOGGER.info(e.getMessage());
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ErrorResponse.builder()
+                        .status(e.getErrorCode().getStatus())
+                        .message(e.getErrorCode().getMessage())
+                        .customMessage(e.getCustomMessage())
+                        .build());
+    }
+
+    @ExceptionHandler(AlreadyHasUserID.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final AlreadyHasUserID e){
+        LOGGER.info(e.getMessage());
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ErrorResponse.builder()
+                        .status(e.getErrorCode().getStatus())
+                        .message(e.getErrorCode().getMessage())
+                        .customMessage(e.getCustomMessage())
+                        .build());
+    }
+
 }
