@@ -28,4 +28,8 @@ public class PostItDTO {
     private int status;
 
     private String message;
+
+    public void setPostitCOLOR(String postitCOLOR) {
+        this.postitCOLOR = Color.valueOf(postitCOLOR);
+    }
 }

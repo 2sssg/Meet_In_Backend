@@ -15,7 +15,7 @@ import javax.persistence.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Six_hatDTO {
+public class SixhatDTO {
     private Long id;
 
     private Enum<MeetStep> meetSTEP;
@@ -27,4 +27,8 @@ public class Six_hatDTO {
     private int status;
 
     private String message;
+
+    public void setMeetSTEP(String meetSTEP) {
+        this.meetSTEP = MeetStep.valueOf(meetSTEP);
+    }
 }
