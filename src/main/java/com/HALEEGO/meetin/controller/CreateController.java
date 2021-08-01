@@ -6,11 +6,11 @@ import com.HALEEGO.meetin.Constant.Enum.MeetStep;
 import com.HALEEGO.meetin.Constant.Enum.MeetType;
 import com.HALEEGO.meetin.Constant.Enum.Return;
 import com.HALEEGO.meetin.DTO.RoomDTO;
-import com.HALEEGO.meetin.DTO.Six_hatDTO;
+import com.HALEEGO.meetin.DTO.SixhatDTO;
 import com.HALEEGO.meetin.DTO.UserDTO;
 import com.HALEEGO.meetin.Exception.AlreadyHasUserID;
 import com.HALEEGO.meetin.Exception.AlreadyStartMeetException;
-import com.HALEEGO.meetin.model.MeetKind.Six_hat;
+import com.HALEEGO.meetin.model.MeetKind.Sixhat;
 import com.HALEEGO.meetin.model.Room;
 import com.HALEEGO.meetin.model.ToolKind.Tool;
 import com.HALEEGO.meetin.model.User;
@@ -41,7 +41,7 @@ public class CreateController {
     @Autowired
     ToolRepository toolRepository;
     @Autowired
-    Six_hatRepository six_hatRepository;
+    SixhatRepository sixhatRepository;
 
     @RequestMapping(value = "/save/signup" , method = RequestMethod.POST)
     public Object signup(@RequestBody UserDTO userDTO){
@@ -69,7 +69,7 @@ public class CreateController {
     public RoomDTO createRoom(@RequestBody JSONObject jsonObject) {
         jsonObject.forEach((k,v)->{ LOGGER.info(k+" : "+v); });
         Room room;
-        Six_hat six_hat;
+        Sixhat sixhat;
         Tool tool;
         User_has_Room user_has_room;
         Date time = new Date();
@@ -87,16 +87,16 @@ public class CreateController {
         switch (meetType){
             case SIX_HAT:
                 room.setMeetType(MeetType.SIX_HAT);
-                six_hat = new Six_hat().builder()
+                sixhat = new Sixhat().builder()
                         .meetSTEP(MeetStep.BEFORE_START)
                         .room(room)
                         .build();
 
                 tool = new Tool().builder()
-                        .six_hat(six_hat)
+                        .sixhat(sixhat)
                         .build();
                 toolRepository.save(tool);
-                six_hatRepository.save(six_hat);
+                sixhatRepository.save(sixhat);
                 roomRepository.save(room);
 
                 user_has_room = new User_has_Room().builder()
@@ -106,11 +106,11 @@ public class CreateController {
                 user_has_roomRepository.save(user_has_room);
 
                 Room room1 = roomRepository.findByRoomID(room.getRoomID());
-                List<Six_hat> six_hats =  six_hatRepository.findByRoom(room1);
-                List<Six_hatDTO> six_hatDTOS = new ArrayList<>();
-                for(Six_hat t : six_hats){
-                    six_hatDTOS.add(
-                            new Six_hatDTO().builder()
+                List<Sixhat> sixhats =  sixhatRepository.findByRoom(room1);
+                List<SixhatDTO> sixhatDTOS = new ArrayList<>();
+                for(Sixhat t : sixhats){
+                    sixhatDTOS.add(
+                            new SixhatDTO().builder()
                                     .id(t.getId())
                                     .meetSTEP(t.getMeetSTEP())
                                     .build()
@@ -123,7 +123,7 @@ public class CreateController {
                                 .build()
                         )
                         .meetType(MeetType.SIX_HAT)
-                        .six_hats(six_hatDTOS)
+                        .sixhats(sixhatDTOS)
                         .status(ErrorCode.SUCCESS.getStatus())
                         .message(ErrorCode.SUCCESS.getMessage())
                         .id(roomRepository.findByRoomID(room.getRoomID()).getId())
@@ -141,7 +141,7 @@ public class CreateController {
     @RequestMapping(value = "/save/enterroom" , method = RequestMethod.POST)
     @Transactional
     public RoomDTO enterRoom(@RequestBody JSONObject jsonObject){
-        List<Six_hatDTO> six_hatDTOS = new ArrayList<>();
+        List<SixhatDTO> sixhatDTOS = new ArrayList<>();
         jsonObject.forEach((k,v)->{LOGGER.info(k+" : "+v);});
 
         LOGGER.info(jsonObject.get("userID").toString());
@@ -153,13 +153,13 @@ public class CreateController {
         User user = userRepository.findByuserID(userid).get();
         switch (room.getMeetType()){
             case SIX_HAT:
-                List<Six_hat> six_hats =  six_hatRepository.findByRoom(room);
-                if(six_hats.get(six_hats.size()-1).getMeetSTEP() != MeetStep.BEFORE_START){
+                List<Sixhat> sixhats =  sixhatRepository.findByRoom(room);
+                if(sixhats.get(sixhats.size()-1).getMeetSTEP() != MeetStep.BEFORE_START){
                     throw new AlreadyStartMeetException("이미 방이 시작됐습니다. ", ErrorCode.DUPLICATE);
                 }
-                for(Six_hat t : six_hats){
-                    six_hatDTOS.add(
-                            new Six_hatDTO().builder()
+                for(Sixhat t : sixhats){
+                    sixhatDTOS.add(
+                            new SixhatDTO().builder()
                                     .id(t.getId())
                                     .meetSTEP(t.getMeetSTEP())
                                     .build()
@@ -182,7 +182,7 @@ public class CreateController {
                         .userNAME(user.getUserNAME())
                         .build()
                 ).meetType(room.getMeetType())
-                .six_hats(six_hatDTOS)
+                .sixhats(sixhatDTOS)
                 .build();
     }
 

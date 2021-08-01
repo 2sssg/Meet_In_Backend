@@ -1,7 +1,7 @@
 package com.HALEEGO.meetin.model;
 
 import com.HALEEGO.meetin.Constant.Enum.MeetType;
-import com.HALEEGO.meetin.model.MeetKind.Six_hat;
+import com.HALEEGO.meetin.model.MeetKind.Sixhat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,6 +37,6 @@ public class Room {
 
 
     @OneToMany(fetch = FetchType.LAZY,cascade = CascadeType.ALL,mappedBy = "room")
-    private List<Six_hat> six_hats = new ArrayList<>();
+    private List<Sixhat> sixhats = new ArrayList<>();
 
 }

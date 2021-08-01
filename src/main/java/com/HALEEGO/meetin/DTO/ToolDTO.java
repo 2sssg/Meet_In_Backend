@@ -14,7 +14,7 @@ import java.util.*;
 public class ToolDTO {
     private Long id;
 
-    private Six_hatDTO six_hat;
+    private SixhatDTO sixhat;
 
     private List<PostItDTO> postits =  new ArrayList<>();
 

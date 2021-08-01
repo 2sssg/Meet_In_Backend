@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 @RestController
 public class ReadController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CreateController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReadController.class);
 
     @Autowired
     UserRepository userRepository;

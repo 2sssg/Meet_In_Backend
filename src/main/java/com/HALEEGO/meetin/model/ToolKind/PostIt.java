@@ -2,8 +2,8 @@ package com.HALEEGO.meetin.model.ToolKind;
 
 
 import com.HALEEGO.meetin.Constant.Enum.Color;
-import com.HALEEGO.meetin.model.MeetKind.Six_hat;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +13,7 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class PostIt {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
