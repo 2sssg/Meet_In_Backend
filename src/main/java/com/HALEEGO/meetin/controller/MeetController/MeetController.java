@@ -31,11 +31,10 @@ public class MeetController {
 
     @MessageMapping("/{roomID}/postit")
     @Transactional
-    public void temp(PostItDTO postItDTO , UserDTO userDTO , @PathParam("roomID") int roomID ){
+    public void temp(PostItDTO postItDTO  , @PathParam("roomID") int roomID ){
         JSONObject returnObj = new JSONObject();
 
         returnObj.put("postit" , postItDTO);
-        returnObj.put("user" , userDTO);
         returnObj.put("status" , ErrorCode.SUCCESS.getStatus());
         returnObj.put("message" , ErrorCode.SUCCESS.getMessage());
 

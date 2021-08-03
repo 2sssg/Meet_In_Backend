@@ -6,14 +6,13 @@ import com.HALEEGO.meetin.Constant.Enum.MeetStep;
 import com.HALEEGO.meetin.Constant.Enum.Return;
 import com.HALEEGO.meetin.DTO.PostItDTO;
 import com.HALEEGO.meetin.DTO.ToolDTO;
+import com.HALEEGO.meetin.DTO.UserDTO;
 import com.HALEEGO.meetin.model.MeetKind.Sixhat;
 import com.HALEEGO.meetin.model.Room;
 import com.HALEEGO.meetin.model.ToolKind.PostIt;
 import com.HALEEGO.meetin.model.ToolKind.Tool;
-import com.HALEEGO.meetin.repository.PostitRepository;
-import com.HALEEGO.meetin.repository.RoomRepository;
-import com.HALEEGO.meetin.repository.SixhatRepository;
-import com.HALEEGO.meetin.repository.ToolRepository;
+import com.HALEEGO.meetin.model.User;
+import com.HALEEGO.meetin.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
@@ -47,14 +46,17 @@ public class SixhatController {
     SixhatRepository sixhatRepository;
     @Autowired
     ToolRepository toolRepository;
+    @Autowired
+    UserRepository userRepository;
+
+
+
     @RequestMapping("/save/sixhatStep/{roomid}")
-    public Object SaveSix_hatStep(@PathVariable int roomid, @RequestBody ToolDTO toolDTO) throws ParseException, JsonProcessingException {
-//        jsonObject.forEach(((k,v)->{ LOGGER.info(k + " : "+v); }));
+    public Object SaveSix_hatStep(@PathVariable int roomid, @RequestBody ToolDTO toolDTO)  {
         LOGGER.info("toolDTO : "+toolDTO.toString());
         LOGGER.info(toolDTO.getSixhat().getMeetSTEP().toString());
         LOGGER.info(toolDTO.getPostits().toString());
-//        return toolDTO;
-        JSONParser jsonParser = new JSONParser();
+        JSONObject returnjsonObj = new JSONObject();
         Sixhat sixhat;
         Tool tool;
         PostIt postIt;
@@ -69,7 +71,12 @@ public class SixhatController {
                 .build();
         for (PostItDTO postitDTOS :toolDTO.getPostits()){
             LOGGER.info(postitDTOS.toString());
+
             postIt = new PostIt().builder()
+                    .height(postitDTOS.getHeight())
+                    .width(postitDTOS.getWidth())
+                    .user(userRepository.findByuserID(postitDTOS.getUser().getUserID()).get())
+                    .postitID(postitDTOS.getPostitID())
                     .locationX(postitDTOS.getLocationX())
                     .locationY(postitDTOS.getLocationY())
                     .postitCONTEXT(postitDTOS.getPostitCONTEXT())
@@ -81,7 +88,6 @@ public class SixhatController {
         toolRepository.save(tool);
         sixhatRepository.save(sixhat);
 
-        JSONObject returnjsonObj = new JSONObject();
         returnjsonObj.put("status" , ErrorCode.SUCCESS.getStatus());
         returnjsonObj.put("message" , ErrorCode.SUCCESS.getMessage());
         returnjsonObj.put("customMessage" , Return.SUCCESS);
@@ -96,18 +102,25 @@ public class SixhatController {
     public Object sixthStepRequirement(@PathVariable("roomid") int roomid){
         JSONObject jsonObject = new JSONObject();
         for(Sixhat sixhat : roomRepository.findByRoomID(roomid).getSixhats()){
-            Tool tool = toolRepository.findBySixhat(sixhat);
-            List<PostIt> postItList = postitRepository.findByTool(tool);
+            List<PostIt> postItList = toolRepository.findBySixhat(sixhat).getPostIts();
             List<PostItDTO> postItDTOS = new ArrayList<>();
             for(PostIt postIt : postItList){
                 postItDTOS.add(
                         new PostItDTO().builder()
-                        .id(postIt.getId())
-                        .locationX(postIt.getLocationX())
-                        .locationY(postIt.getLocationY())
-                        .postitCOLOR(postIt.getPostitCOLOR())
-                        .postitCONTEXT(postIt.getPostitCONTEXT())
-                        .build()
+                                .id(postIt.getId())
+                                .width(postIt.getWidth())
+                                .height(postIt.getHeight())
+                                .user(
+                                        new UserDTO().builder()
+                                        .userNAME(postIt.getUser().getUserNAME())
+                                        .build()
+                                )
+                                .postitID(postIt.getPostitID())
+                                .locationX(postIt.getLocationX())
+                                .locationY(postIt.getLocationY())
+                                .postitCOLOR(postIt.getPostitCOLOR())
+                                .postitCONTEXT(postIt.getPostitCONTEXT())
+                                .build()
                 );
             }
             jsonObject.put(sixhat.getMeetSTEP().toString(),postItDTOS);
@@ -119,4 +132,6 @@ public class SixhatController {
 //        messagingTemplate.convertAndSend("/topic/whitehat/"+roomid,jsonObject);
 
     }
+
+
 }
