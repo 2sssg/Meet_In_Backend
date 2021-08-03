@@ -15,11 +15,19 @@ public class PostItDTO {
 
     private Long id;
 
+    private int postitID;
+
     private double locationX;
 
     private double locationY;
 
     private String postitCONTEXT;
+
+    private double width;
+
+    private double height;
+
+    private UserDTO user;
 
     private Enum<Color> postitCOLOR;
 
