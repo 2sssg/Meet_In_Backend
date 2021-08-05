@@ -5,6 +5,8 @@ import com.HALEEGO.meetin.DTO.UserDTO;
 import com.HALEEGO.meetin.model.Room;
 import com.HALEEGO.meetin.model.User;
 import com.HALEEGO.meetin.repository.RoomRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +24,9 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Slf4j
 class CreateControllerTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CreateController.class);
     @Test
     public void signup(){
         User user = User.builder()
@@ -49,26 +51,31 @@ class CreateControllerTest {
     public void hashtest(){
 
         Room room = roomRepository.getById(1L);
-        LOGGER.info("여기");
-//        User user = roomRepository.getById(1L).getHostUSER();
-        LOGGER.info("여기");
         UserDTO userDTO = new UserDTO().builder()
                 .userID(room.getHostUSER().getUserID())
                 .userPW(room.getHostUSER().getUserPW())
                 .userNAME(room.getHostUSER().getUserNAME())
                 .id(room.getHostUSER().getId())
                 .build();
-        LOGGER.info("여기");
+        log.info("여기");
         RoomDTO roomDTO = new RoomDTO().builder()
                 .roomID(room.getRoomID())
                 .id(room.getId())
                 .hostUSER(userDTO)
                 .build();
-        LOGGER.info(String.valueOf(roomDTO.getRoomID()));
-        LOGGER.info(String.valueOf(roomDTO.getId()));
-        LOGGER.info(String.valueOf(roomDTO.getHostUSER().getUserID()));
+        log.info(String.valueOf(roomDTO.getRoomID()));
+        log.info(String.valueOf(roomDTO.getId()));
+        log.info(String.valueOf(roomDTO.getHostUSER().getUserID()));
 
 
+    }
+
+    @Test
+    public void test(){
+        JSONObject jsonObject = new JSONObject();
+
+        jsonObject.put("roomID",123213);
+       log.info(jsonObject.containsKey("userID")?"TRUE":"FALSE");
     }
 
 }
