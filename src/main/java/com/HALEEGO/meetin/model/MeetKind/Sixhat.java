@@ -16,7 +16,7 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Builder
 @Data
-public class Six_hat {
+public class Sixhat {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -25,7 +25,7 @@ public class Six_hat {
     private Enum<MeetStep> meetSTEP;
 
 
-    @OneToOne(fetch = FetchType.LAZY , cascade = CascadeType.ALL , mappedBy = "six_hat")
+    @OneToOne(fetch = FetchType.LAZY , cascade = CascadeType.ALL , mappedBy = "sixhat")
     @JoinColumn(name = "TOOL_ID")
     private Tool tool;
 

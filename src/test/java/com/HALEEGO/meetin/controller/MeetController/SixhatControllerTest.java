@@ -1,21 +1,28 @@
 package com.HALEEGO.meetin.controller.MeetController;
 
-import com.HALEEGO.meetin.controller.CreateController;
-import org.json.simple.JSONObject;
+import com.HALEEGO.meetin.Constant.FixedreturnValue;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
+@Slf4j
 class SixhatControllerTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CreateController.class);
-
     @Test
-    public void test(){
+    public void returnvalTest(){
+        FixedreturnValue a;
+        a = new FixedreturnValue().builder()
+                .status(200)
+                .message("zz")
+                .customMessage("오메야")
+                .build();
+
+        log.info(String.valueOf(a.getStatus()));
+        log.info(a.getMessage());
+        log.info(a.getCustomMessage());
     }
 }

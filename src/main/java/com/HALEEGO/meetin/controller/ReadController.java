@@ -2,11 +2,13 @@ package com.HALEEGO.meetin.controller;
 
 
 import com.HALEEGO.meetin.Constant.Enum.ErrorCode;
+import com.HALEEGO.meetin.Constant.FixedreturnValue;
 import com.HALEEGO.meetin.DTO.UserDTO;
 import com.HALEEGO.meetin.Exception.InconsistencyException;
 import com.HALEEGO.meetin.Exception.NotFoundException;
 import com.HALEEGO.meetin.model.User;
 import com.HALEEGO.meetin.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +22,17 @@ import java.util.HashMap;
 import java.util.function.Supplier;
 
 @RestController
+@Slf4j
 public class ReadController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CreateController.class);
 
     @Autowired
     UserRepository userRepository;
 
-    @RequestMapping(value = "/login" , method = RequestMethod.POST)
+    @RequestMapping(value = "/read/login" , method = RequestMethod.POST)
     public Object login(@RequestBody UserDTO userDTO) throws Throwable {
+        log.info("login start");
         UserDTO returnuserDTO;
-        User user = userRepository.findByuserID(userDTO.getUserID()).orElseThrow(new Supplier<Throwable>() {
+        User user = userRepository.findByUserID(userDTO.getUserID()).orElseThrow(new Supplier<Throwable>() {
             @Override
             public Throwable get() {
                 return new NotFoundException("해당 id가 없습니다", ErrorCode.NOT_FOUND);
@@ -42,12 +44,15 @@ public class ReadController {
                     .userID(user.getUserID())
                     .userPW(user.getUserPW())
                     .userNAME(user.getUserNAME())
-                    .status(ErrorCode.SUCCESS.getStatus())
-                    .message(ErrorCode.SUCCESS.getMessage())
                     .build();
-            return returnuserDTO;
+
+            log.info("enterRoom success end");
+            return new FixedreturnValue<UserDTO>(returnuserDTO);
         }
-        else throw new InconsistencyException("password가 일치 하지 않음", ErrorCode.INCONSISTENCY);
+        else {
+            log.info("enterRoom fail end");
+            throw new InconsistencyException("password가 일치 하지 않음", ErrorCode.INCONSISTENCY);
+        }
     }
 
 
