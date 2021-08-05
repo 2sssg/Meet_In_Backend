@@ -2,6 +2,7 @@ package com.HALEEGO.meetin.DTO;
 
 
 import com.HALEEGO.meetin.Constant.Enum.Color;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PostItDTO {
 
     private Long id;
@@ -32,10 +34,6 @@ public class PostItDTO {
     private Enum<Color> postitCOLOR;
 
     private ToolDTO tool;
-
-    private int status;
-
-    private String message;
 
     public void setPostitCOLOR(String postitCOLOR) {
         this.postitCOLOR = Color.valueOf(postitCOLOR);

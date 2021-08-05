@@ -1,6 +1,7 @@
 package com.HALEEGO.meetin.DTO;
 
 import com.HALEEGO.meetin.Constant.Enum.MeetType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class RoomDTO {
     private Long id;
 
@@ -25,7 +27,4 @@ public class RoomDTO {
 
     private List<UserDTO> users = new ArrayList<>();
 
-    private int status;
-
-    private String message;
 }
