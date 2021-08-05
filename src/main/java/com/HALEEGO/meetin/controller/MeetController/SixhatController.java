@@ -4,6 +4,7 @@ import java.util.*;
 import com.HALEEGO.meetin.Constant.Enum.ErrorCode;
 import com.HALEEGO.meetin.Constant.Enum.MeetStep;
 import com.HALEEGO.meetin.Constant.Enum.Return;
+import com.HALEEGO.meetin.Constant.FixedreturnValue;
 import com.HALEEGO.meetin.DTO.PostItDTO;
 import com.HALEEGO.meetin.DTO.ToolDTO;
 import com.HALEEGO.meetin.DTO.UserDTO;
@@ -15,6 +16,7 @@ import com.HALEEGO.meetin.model.User;
 import com.HALEEGO.meetin.repository.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -34,8 +36,8 @@ import javax.websocket.server.PathParam;
 @RestController
 @Transactional
 @RequiredArgsConstructor
+@Slf4j
 public class SixhatController {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SixhatController.class);
     @Autowired
     private final SimpMessageSendingOperations messagingTemplate;
     @Autowired
@@ -51,12 +53,12 @@ public class SixhatController {
 
 
 
-    @RequestMapping("/save/sixhatStep/{roomid}")
+    @RequestMapping("/create/sixhatStep/{roomid}")
     public Object SaveSix_hatStep(@PathVariable int roomid, @RequestBody ToolDTO toolDTO)  {
-        LOGGER.info("toolDTO : "+toolDTO.toString());
-        LOGGER.info(toolDTO.getSixhat().getMeetSTEP().toString());
-        LOGGER.info(toolDTO.getPostits().toString());
-        JSONObject returnjsonObj = new JSONObject();
+        log.info("saveSix_hatStep start");
+        log.info("toolDTO : "+toolDTO.toString());
+        log.info("meetStep : " + toolDTO.getSixhat().getMeetSTEP().toString());
+        log.info("postits : "+toolDTO.getPostits().toString());
         Sixhat sixhat;
         Tool tool;
         PostIt postIt;
@@ -70,12 +72,12 @@ public class SixhatController {
                 .sixhat(sixhat)
                 .build();
         for (PostItDTO postitDTOS :toolDTO.getPostits()){
-            LOGGER.info(postitDTOS.toString());
+            log.info("postitDTOS : " + postitDTOS.toString());
 
             postIt = new PostIt().builder()
                     .height(postitDTOS.getHeight())
                     .width(postitDTOS.getWidth())
-                    .user(userRepository.findByuserID(postitDTOS.getUser().getUserID()).get())
+                    .user(userRepository.findById(postitDTOS.getUser().getId()).get())
                     .postitID(postitDTOS.getPostitID())
                     .locationX(postitDTOS.getLocationX())
                     .locationY(postitDTOS.getLocationY())
@@ -88,10 +90,8 @@ public class SixhatController {
         toolRepository.save(tool);
         sixhatRepository.save(sixhat);
 
-        returnjsonObj.put("status" , ErrorCode.SUCCESS.getStatus());
-        returnjsonObj.put("message" , ErrorCode.SUCCESS.getMessage());
-        returnjsonObj.put("customMessage" , Return.SUCCESS);
-        return returnjsonObj;
+        log.info("saveSix_hatStep end");
+        return new FixedreturnValue<>();
     }
 
 
@@ -100,6 +100,7 @@ public class SixhatController {
     @Transactional
     @RequestMapping(value = "/read/whitehat/{roomid}")
     public Object sixthStepRequirement(@PathVariable("roomid") int roomid){
+        log.info("sixthStepRequirement start");
         JSONObject jsonObject = new JSONObject();
         for(Sixhat sixhat : roomRepository.findByRoomID(roomid).getSixhats()){
             List<PostIt> postItList = toolRepository.findBySixhat(sixhat).getPostIts();
@@ -125,10 +126,8 @@ public class SixhatController {
             }
             jsonObject.put(sixhat.getMeetSTEP().toString(),postItDTOS);
         }
-        jsonObject.put("status", ErrorCode.SUCCESS.getStatus());
-        jsonObject.put("message", ErrorCode.SUCCESS.getMessage());
-        jsonObject.put("customMessage" , Return.SUCCESS);
-        return jsonObject;
+        log.info("sixthStepRequirement end");
+        return new FixedreturnValue<JSONObject>(jsonObject);
 //        messagingTemplate.convertAndSend("/topic/whitehat/"+roomid,jsonObject);
 
     }
