@@ -32,7 +32,7 @@ public class Room {
     @JoinColumn(name = "HOSTUSER_ID")
     private User hostUSER;
 
-    @OneToMany(cascade = CascadeType.ALL , mappedBy = "room" , fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "room" , fetch = FetchType.LAZY)
     private List<User_has_Room> users = new ArrayList<>();
 
 

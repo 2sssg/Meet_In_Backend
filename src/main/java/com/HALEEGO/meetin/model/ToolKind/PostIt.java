@@ -26,7 +26,7 @@ public class PostIt {
     @Column
     private double height;
 
-    @ManyToOne(fetch = FetchType.LAZY , cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY )
     @JoinColumn(name = "USER_ID" )
     private User user;
 
