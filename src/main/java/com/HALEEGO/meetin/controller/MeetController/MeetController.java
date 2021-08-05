@@ -12,6 +12,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import java.util.*;
 
 import javax.websocket.server.PathParam;
 
@@ -29,9 +30,9 @@ public class MeetController {
 
     @MessageMapping("/move/postit/{roomid}")
     @Transactional
-    public void movepostit(PostItDTO postItDTO  , @PathParam("roomID") int roomID ){
+    public void movepostit(List<PostItDTO> postItDTO  , @PathParam("roomID") int roomID ){
         log.info("move postit start");
-        messagingTemplate.convertAndSend("/topic/"+roomID+"/postit" , new FixedreturnValue<PostItDTO>(postItDTO));
+        messagingTemplate.convertAndSend("/topic/"+roomID+"/postit" , new FixedreturnValue<List<PostItDTO>>(postItDTO));
         log.info("move postit end");
     }
 
