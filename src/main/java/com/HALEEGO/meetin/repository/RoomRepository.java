@@ -6,6 +6,7 @@ import java.util.*;
 
 public interface RoomRepository extends JpaRepository<Room,Long> {
 
+    void deleteByRoomID(int roomid);
     Room findByRoomID(int roomid);
 
 }
