@@ -10,7 +10,7 @@ public enum ErrorCode {
     NOT_FOUND(404,"NOT_FOUND"),
     DUPLICATE(400, "DUPLICATE"),
     INCONSISTENCY(404, "INCONSISTENCY"),
-    SUCCESS(200,"Success")
+    SUCCESS(200,"SUCCESS")
     ;
 
     private int status;
