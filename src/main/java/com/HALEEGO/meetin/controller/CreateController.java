@@ -196,9 +196,9 @@ public class CreateController {
         }
         User_has_Room user_has_room =
                 new User_has_Room().builder()
-                .room(room)
-                .user(user)
-                .build();
+                    .room(room)
+                    .user(user)
+                    .build();
         user_has_roomRepository.save(user_has_room);
         List<User_has_Room> users = user_has_roomRepository.findByRoom(room);
         List<UserDTO> userDTOS = new ArrayList<>();
@@ -224,7 +224,7 @@ public class CreateController {
                 .build();
 
 //        messagingTemplate.convertAndSend("/topic/enterroom/"+roomid,user);
-        log.info("enterRoom success end");
+        log.info("enterRoom success end1");
         return new FixedreturnValue<RoomDTO>(roomDTO);
     }
 
