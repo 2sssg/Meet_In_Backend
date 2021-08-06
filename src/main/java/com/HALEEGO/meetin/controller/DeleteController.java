@@ -2,15 +2,13 @@ package com.HALEEGO.meetin.controller;
 
 
 import com.HALEEGO.meetin.Constant.FixedreturnValue;
-import com.HALEEGO.meetin.model.MeetKind.Sixhat;
+import com.HALEEGO.meetin.model.Room;
 import com.HALEEGO.meetin.model.ToolKind.PostIt;
 import com.HALEEGO.meetin.model.User;
 import com.HALEEGO.meetin.model.User_has_Room;
 import com.HALEEGO.meetin.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.transaction.annotation.Transactional;
@@ -72,8 +70,12 @@ public class DeleteController {
         List<User_has_Room> uhr = user_has_roomRepository.findByRoom(roomRepository.findByRoomID(roomid));
         for(User_has_Room u : uhr){
             u.setUser(null);
+            u.getRoom().setHostUSER(null);
+            u.setRoom(null);
             user_has_roomRepository.delete(u);
         }
+        Room room = roomRepository.findByRoomID(roomid);
+        roomRepository.delete(room);
         return new FixedreturnValue();
     }
 
