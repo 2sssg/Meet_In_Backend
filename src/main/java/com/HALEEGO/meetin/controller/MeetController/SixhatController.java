@@ -99,7 +99,7 @@ public class SixhatController {
 //    @MessageMapping(value = "/read/whitehat/{roomid}")
     @Transactional
     @RequestMapping(value = "/read/whitehat/{roomid}")
-    public Object sixthStepRequirement(@PathVariable("roomid") int roomid){
+    public Object returnWhitehat(@PathVariable("roomid") int roomid){
         log.info("sixthStepRequirement start");
         JSONObject jsonObject = new JSONObject();
         for(Sixhat sixhat : roomRepository.findByRoomID(roomid).getSixhats()){

@@ -38,7 +38,7 @@ public class DeleteController {
 
     @RequestMapping("/delete/endroom/{roomid}")
     @Transactional
-    public FixedreturnValue endroom(@PathVariable  int roomid){
+    public FixedreturnValue deleteGuest_Endroom(@PathVariable  int roomid){
         log.info("endroom start" );
             List<User_has_Room> users = user_has_roomRepository.findByRoom(roomRepository.findByRoomID(roomid));
             for(User_has_Room u : users) {
@@ -66,7 +66,7 @@ public class DeleteController {
     //TODO : 고쳐야됨
     @RequestMapping("/delete/deleteroom/{roomid}")
     @Transactional
-    public FixedreturnValue deleteroom(@PathVariable int roomid){
+    public FixedreturnValue deleteRoom(@PathVariable int roomid){
         List<User_has_Room> uhr = user_has_roomRepository.findByRoom(roomRepository.findByRoomID(roomid));
         for(User_has_Room u : uhr){
             u.setUser(null);

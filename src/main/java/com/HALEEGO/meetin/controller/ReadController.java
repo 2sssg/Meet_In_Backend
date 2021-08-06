@@ -29,7 +29,7 @@ public class ReadController {
     UserRepository userRepository;
 
     @RequestMapping(value = "/read/login" , method = RequestMethod.POST)
-    public Object login(@RequestBody UserDTO userDTO) throws Throwable {
+    public Object signIn(@RequestBody UserDTO userDTO) throws Throwable {
         log.info("login start");
         UserDTO returnuserDTO;
         User user = userRepository.findByUserID(userDTO.getUserID()).orElseThrow(new Supplier<Throwable>() {
