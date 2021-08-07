@@ -9,17 +9,12 @@ import com.HALEEGO.meetin.Exception.NotFoundException;
 import com.HALEEGO.meetin.model.User;
 import com.HALEEGO.meetin.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
-import java.util.HashMap;
-import java.util.function.Supplier;
 
 @RestController
 @Slf4j
@@ -32,12 +27,8 @@ public class ReadController {
     public Object signIn(@RequestBody UserDTO userDTO) throws Throwable {
         log.info("login start");
         UserDTO returnuserDTO;
-        User user = userRepository.findByUserID(userDTO.getUserID()).orElseThrow(new Supplier<Throwable>() {
-            @Override
-            public Throwable get() {
-                return new NotFoundException("해당 id가 없습니다", ErrorCode.NOT_FOUND);
-            }
-        });
+        User user = userRepository.findByUserID(userDTO.getUserID()).orElseThrow(
+                () -> new NotFoundException("해당 id가 없습니다", ErrorCode.NOT_FOUND));
         if(userDTO.getUserPW().equals(user.getUserPW())) {
             returnuserDTO = UserDTO.builder()
                     .id(user.getId())
