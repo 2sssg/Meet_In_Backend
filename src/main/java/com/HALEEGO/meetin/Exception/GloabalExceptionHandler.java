@@ -30,6 +30,26 @@ public class GloabalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(NoRoomIDException.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final NoRoomIDException e) {
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ErrorResponse.builder()
+                        .status(e.getErrorCode().getStatus())
+                        .message(e.getErrorCode().getMessage())
+                        .customMessage(e.getCustomMessage())
+                        .build());
+    }
+    @ExceptionHandler(NoUserIdException.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final NoUserIdException e) {
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ErrorResponse.builder()
+                        .status(e.getErrorCode().getStatus())
+                        .message(e.getErrorCode().getMessage())
+                        .customMessage(e.getCustomMessage())
+                        .build());
+    }
 
     @ExceptionHandler(InconsistencyException.class)
     public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final InconsistencyException e) {
