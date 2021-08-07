@@ -11,6 +11,7 @@ import com.HALEEGO.meetin.DTO.SixhatDTO;
 import com.HALEEGO.meetin.DTO.UserDTO;
 import com.HALEEGO.meetin.Exception.AlreadyHasUserID;
 import com.HALEEGO.meetin.Exception.AlreadyStartMeetException;
+import com.HALEEGO.meetin.Exception.NotFoundException;
 import com.HALEEGO.meetin.model.MeetKind.Sixhat;
 import com.HALEEGO.meetin.model.Room;
 import com.HALEEGO.meetin.model.ToolKind.Tool;
@@ -20,15 +21,10 @@ import com.HALEEGO.meetin.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -52,7 +48,7 @@ public class CreateController {
     SixhatRepository sixhatRepository;
 
     @RequestMapping(value = "/create/signup" , method = RequestMethod.POST)
-    public Object signup(@RequestBody UserDTO userDTO){
+    public Object signup(@RequestBody UserDTO userDTO){ //회원가입
         log.info("signup start ");
         JSONObject jsonobj = new JSONObject();
         log.info("userID : "+userDTO.getUserID());
@@ -66,7 +62,7 @@ public class CreateController {
         try {
             userRepository.save(user);
             log.info("signup success end");
-            return new FixedreturnValue();
+            return new FixedreturnValue<>();
         }catch (Exception e){
               throw new AlreadyHasUserID("이미 있는 아이디입니다" , ErrorCode.DUPLICATE);
         }
@@ -98,6 +94,7 @@ public class CreateController {
                                         .hashCode()
                         )
                 )
+                .title(jsonObject.get("title").toString())
                 .hostUSER(user)
                 .build();
 
@@ -115,41 +112,28 @@ public class CreateController {
                         .build();
                 toolRepository.save(tool);
                 sixhatRepository.save(sixhat);
-                roomRepository.save(room);
+                Room room1 = roomRepository.save(room);
 
                 user_has_room = new User_has_Room().builder()
                         .user(user)
                         .room(room)
                         .build();
                 user_has_roomRepository.save(user_has_room);
-
-                Room room1 = roomRepository.findByRoomID(room.getRoomID());
-                List<Sixhat> sixhats =  sixhatRepository.findByRoom(room1);
-                List<SixhatDTO> sixhatDTOS = new ArrayList<>();
-                for(Sixhat t : sixhats){
-                    sixhatDTOS.add(
-                            new SixhatDTO().builder()
-                                    .id(t.getId())
-                                    .meetSTEP(t.getMeetSTEP())
-                                    .build()
-                    );
-                }
                 RoomDTO roomDTO = new RoomDTO().builder()
-                        .roomID(room.getRoomID())
+                        .roomID(room1.getRoomID())
+                        .title(room1.getTitle())
                         .hostUSER(new UserDTO().builder()
                                 .userNAME(user.getUserNAME())
                                 .build()
                         )
                         .meetType(MeetType.SIX_HAT)
-                        .sixhats(sixhatDTOS)
-//                        .id(roomRepository.findByRoomID(room.getRoomID()).getId())
                         .build();
                 log.info("createRoom Success end");
                 return new FixedreturnValue<RoomDTO>(roomDTO);
 
         }
         log.info("createRoom fail end");
-        return new FixedreturnValue().builder()
+        return new FixedreturnValue<>().builder()
                 .status(ErrorCode.NOT_FOUND.getStatus())
                 .message(ErrorCode.NOT_FOUND.getMessage())
                 .customMessage(Return.FAIL.toString())
@@ -160,11 +144,11 @@ public class CreateController {
 //    @MessageMapping(value = "/save/enterroom")
     @RequestMapping(value = "/create/enterroom" , method = RequestMethod.POST)
     @Transactional
-    public Object enterRoom(@RequestBody JSONObject jsonObject){
+    public Object enterRoom(@RequestBody JSONObject jsonObject) {
         log.info("enterRoom start");
         List<SixhatDTO> sixhatDTOS = new ArrayList<>();
         RoomDTO roomDTO;
-        User usertmp = new User();
+        User guestUser = new User();
         jsonObject.forEach((k,v)->{log.info(k+" : "+v);});
 
         log.info(jsonObject.containsKey("id")?
@@ -172,13 +156,18 @@ public class CreateController {
                 "guest 이용자입니다");
         log.info("roomID : " + jsonObject.get("roomID").toString());
         if(!jsonObject.containsKey("id")){
-            usertmp.setUserNAME(jsonObject.get("userNAME").toString());
-            userRepository.save(usertmp);
+            guestUser = userRepository.save(
+                    new User().builder()
+                    .userNAME(jsonObject.get("userNAME").toString())
+                    .build()
+            );
         }
         Long id = jsonObject.containsKey("id")?Long.parseLong(jsonObject.get("id").toString()):0L;
         int roomid = Integer.parseInt(jsonObject.get("roomID").toString());
-        Room room  = roomRepository.findByRoomID(roomid);
-        User user = userRepository.findById(id).orElse(usertmp);
+        Room room  = roomRepository.findByRoomID(roomid).orElseThrow(()->
+                new NotFoundException("해당 방(방 번호 : "+roomid+") 이 없습니다 ", ErrorCode.NOT_FOUND)
+        );
+        User user = userRepository.findById(id).orElse(guestUser);
         switch (room.getMeetType()){
             case SIX_HAT:
                 List<Sixhat> sixhats =  sixhatRepository.findByRoom(room);
@@ -207,14 +196,14 @@ public class CreateController {
                     new UserDTO().builder()
                             .userNAME(u.getUser().getUserNAME())
                             .id(
-                                    u.getUser().getUserNAME() == user.getUserNAME()?user.getId():0L
+                                    u.getUser().getUserNAME().equals(user.getUserNAME())?user.getId():0L
                             )
                             .build()
             );
         }
         roomDTO = new RoomDTO().builder()
-                .id(room.getId())
                 .roomID(roomid)
+                .title(room.getTitle())
                 .hostUSER(
                         new UserDTO().builder()
                                 .userNAME(room.getHostUSER().getUserNAME())
@@ -223,12 +212,9 @@ public class CreateController {
                 .users(userDTOS)
                 .build();
 
-//        messagingTemplate.convertAndSend("/topic/enterroom/"+roomid,user);
-        log.info("enterRoom success end1");
+        messagingTemplate.convertAndSend("/topic/enterroom/"+roomid,userDTOS);
+        log.info("enterRoom success end");
         return new FixedreturnValue<RoomDTO>(roomDTO);
     }
-
-
-
 
 }
