@@ -17,6 +17,8 @@ import java.util.*;
 public class RoomDTO {
     private Long id;
 
+    private String title;
+
     private int roomID;
 
     private UserDTO hostUSER;
