@@ -40,43 +40,54 @@ public class DeleteController {
     @Transactional
     public FixedreturnValue deleteGuest_Endroom(@PathVariable  int roomid){
         log.info("endroom start" );
-            List<User_has_Room> users = user_has_roomRepository.findByRoom(roomRepository.findByRoomID(roomid));
-            for(User_has_Room u : users) {
-                if(u.getUser().getUserID()==null) {
-                    log.info("여기 들어오긴함");
-                    User user = u.getUser();
-                    user_has_roomRepository.delete(u);
-                    user.getRooms().remove(u.getRoom());
-                    if(!user.getPostits().isEmpty()){
-                        log.info("if문 : " + String.valueOf(user.getPostits().size()));
-                        for(PostIt p : user.getPostits()){
-                            p.setUser(null);
-                        }
-                    }else{
-                        log.info("else문 : " );
+        List<User_has_Room> user_has_rooms = roomRepository.findByRoomID(roomid).orElse(null).getUsers();
+        for(User_has_Room u : user_has_rooms) {
+            if(u.getUser().getUserID()==null) {
+                log.info("여기 들어오긴함");
+                User user = u.getUser();
+                user_has_roomRepository.delete(u);
+                user.getRooms().remove(u.getRoom());
+                if(!user.getPostits().isEmpty()){
+                    log.info("if문 : " + String.valueOf(user.getPostits().size()));
+                    for(PostIt p : user.getPostits()){
+                        p.setUser(null);
                     }
-                    userRepository.delete(user);
+                }else{
+                    log.info("else문 : " );
                 }
+                userRepository.delete(user);
             }
-            log.info("enterRoom end");
-            return new FixedreturnValue();
+        }
+        log.info("enterRoom end");
+        return new FixedreturnValue();
     }
 
-    //TODO : 방 삭제하면 그 방에 있는 유저 싹다 날아가는 오류
-    //TODO : 고쳐야됨
+
+
+
+
     @RequestMapping("/delete/deleteroom/{roomid}")
     @Transactional
-    public FixedreturnValue deleteRoom(@PathVariable int roomid){
-        List<User_has_Room> uhr = user_has_roomRepository.findByRoom(roomRepository.findByRoomID(roomid));
-        for(User_has_Room u : uhr){
-            u.setUser(null);
-            u.getRoom().setHostUSER(null);
-            u.setRoom(null);
-            user_has_roomRepository.delete(u);
+    public Object deleteRoom(@PathVariable int roomid){
+        Room room = roomRepository.findByRoomID(roomid).orElse(null);
+        List<User_has_Room> uhr;
+        if(room != null){
+            uhr = room.getUsers();
+        }else{
+            throw new NullPointerException();
         }
-        Room room = roomRepository.findByRoomID(roomid);
+        if(uhr !=null){
+            for(User_has_Room u : uhr){
+                u.setUser(null);
+                u.getRoom().setHostUSER(null);
+                u.setRoom(null);
+                user_has_roomRepository.delete(u);
+            }
+        }else{
+            throw new NullPointerException();
+        }
         roomRepository.delete(room);
-        return new FixedreturnValue();
+        return new FixedreturnValue<>();
     }
 
 }
