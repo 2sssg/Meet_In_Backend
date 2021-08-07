@@ -2,6 +2,7 @@ package com.HALEEGO.meetin.model;
 
 import com.HALEEGO.meetin.Constant.Enum.MeetType;
 import com.HALEEGO.meetin.model.MeetKind.Sixhat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,6 +29,9 @@ public class Room {
 
     @Column
     private MeetType meetType;
+
+    @Column
+    private String title;
 
     @ManyToOne(fetch = FetchType.LAZY , cascade = CascadeType.ALL)
     @JoinColumn(name = "HOSTUSER_ID")
