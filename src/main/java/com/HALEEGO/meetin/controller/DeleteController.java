@@ -1,7 +1,9 @@
 package com.HALEEGO.meetin.controller;
 
 
+import com.HALEEGO.meetin.Constant.Enum.ErrorCode;
 import com.HALEEGO.meetin.Constant.FixedreturnValue;
+import com.HALEEGO.meetin.Exception.NoRoomIDException;
 import com.HALEEGO.meetin.model.Room;
 import com.HALEEGO.meetin.model.ToolKind.PostIt;
 import com.HALEEGO.meetin.model.User;
@@ -9,10 +11,12 @@ import com.HALEEGO.meetin.model.User_has_Room;
 import com.HALEEGO.meetin.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
@@ -61,6 +65,7 @@ public class DeleteController {
         log.info("enterRoom end");
         return new FixedreturnValue();
     }
+////////////////////////////안쓸거임//////////////////////////////////////
 
 
 
@@ -69,25 +74,43 @@ public class DeleteController {
     @RequestMapping("/delete/deleteroom/{roomid}")
     @Transactional
     public Object deleteRoom(@PathVariable int roomid){
-        Room room = roomRepository.findByRoomID(roomid).orElse(null);
-        List<User_has_Room> uhr;
-        if(room != null){
-            uhr = room.getUsers();
-        }else{
-            throw new NullPointerException();
-        }
-        if(uhr !=null){
-            for(User_has_Room u : uhr){
-                u.setUser(null);
-                u.getRoom().setHostUSER(null);
-                u.setRoom(null);
-                user_has_roomRepository.delete(u);
-            }
-        }else{
-            throw new NullPointerException();
+        log.info("deleteRoom start");
+        Room room = roomRepository.findByRoomID(roomid).orElseThrow(()->
+                new NoRoomIDException("방을 못찾겠음 ㅠㅠ", ErrorCode.NOT_FOUND)
+                );
+        List<User_has_Room> uhr = room.getUsers();
+        for(User_has_Room u : uhr) {
+            u.setUser(null);
+            u.getRoom().setHostUSER(null);
+            u.setRoom(null);
+            user_has_roomRepository.delete(u);
         }
         roomRepository.delete(room);
-        return new FixedreturnValue<>();
+        FixedreturnValue<Object> fixedreturnValue = new FixedreturnValue<>();
+        log.info("returnValue : "+ fixedreturnValue);
+        log.info("deleteRoom end");
+        return fixedreturnValue;
     }
+
+
+
+    @RequestMapping("delete/exituser")
+    @Transactional
+    public Object exituser(@RequestBody  JSONObject jsonObject){
+        log.info("exituser start");
+        jsonObject.forEach((k,v)->log.info(k+" : "+v));
+        Long id = Long.parseLong(jsonObject.get("id").toString());
+        int roomID = Integer.parseInt(jsonObject.get("roomID").toString());
+        User_has_Room user_has_room = user_has_roomRepository.findByRoom_RoomIDAndUser_Id(roomID,id);
+        user_has_room.setRoom(null);
+        if(user_has_room.getUser().getUserID() != null){
+            user_has_room.setUser(null);
+        }
+        user_has_roomRepository.delete(user_has_room);
+
+        return null;
+    }
+
+    //////////////////////////////////////이것도 안쓸거임/////////////////////////////////////////
 
 }

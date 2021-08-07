@@ -29,7 +29,7 @@ public class ReadController {
         UserDTO returnuserDTO;
         User user = userRepository.findByUserID(userDTO.getUserID()).orElseThrow(
                 () -> new NotFoundException("해당 id가 없습니다", ErrorCode.NOT_FOUND));
-        if(userDTO.getUserPW().equals(user.getUserPW())) {
+        if (userDTO.getUserPW().equals(user.getUserPW())) {
             returnuserDTO = UserDTO.builder()
                     .id(user.getId())
                     .userID(user.getUserID())
@@ -37,17 +37,13 @@ public class ReadController {
                     .userNAME(user.getUserNAME())
                     .build();
 
+            FixedreturnValue<UserDTO> fixedreturnValue =  new FixedreturnValue<>(returnuserDTO);
+            log.info("returnValue : "+fixedreturnValue);
             log.info("enterRoom success end");
-            return new FixedreturnValue<UserDTO>(returnuserDTO);
-        }
-        else {
+            return fixedreturnValue;
+        } else {
             log.info("enterRoom fail end");
             throw new InconsistencyException("password가 일치 하지 않음", ErrorCode.INCONSISTENCY);
         }
     }
-
-
-
-
-
 }

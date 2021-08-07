@@ -8,6 +8,7 @@ import com.HALEEGO.meetin.repository.RoomRepository;
 import com.HALEEGO.meetin.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,18 +32,26 @@ public class MeetController {
     @MessageMapping("/move/postit/{roomid}")
     public void movepostit(List<PostItDTO> postItDTO  , @PathParam("roomid") int roomID ){ //포스트잇 웹소켓팅
         log.info("move postit start");
-        messagingTemplate.convertAndSend("/topic/"+roomID+"/move/postit" , new FixedreturnValue<List<PostItDTO>>(postItDTO));
+
+        FixedreturnValue<List<PostItDTO>> fixedreturnValue = new FixedreturnValue<>(postItDTO);
+        log.info("returnValue : " + fixedreturnValue.toString());
+
+        messagingTemplate.convertAndSend("/topic/move/postit"+roomID , fixedreturnValue);
         log.info("move postit end");
     }
 
     @MessageMapping("/move/nextstep/{roomid}")
-    public void movenextstep(MeetStep meetStep, @PathParam("roomid") int roomID ){
+    public void movenextstep(JSONObject jsonObject, @PathParam("roomid") int roomID ){// 다음단계로 넘어가는 웹소켓팅
         log.info("movenextstep start");
-        messagingTemplate.convertAndSend("/topic/"+roomID+"/move/nextstep", new FixedreturnValue<MeetStep>(meetStep.meetstepnext(meetStep)));
+
+        MeetStep meetStep = MeetStep.valueOf(jsonObject.get("meetStep").toString());
+        FixedreturnValue<MeetStep> fixedreturnValue = new FixedreturnValue<>(meetStep.meetstepnext(meetStep));
+        log.info("returnValue : " +fixedreturnValue.toString());
+
+        messagingTemplate.convertAndSend("/topic/move/nextstep"+roomID, fixedreturnValue);
+
         log.info("movenextstep end");
     }
-
-
 
 }
 
