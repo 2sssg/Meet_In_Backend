@@ -6,6 +6,6 @@ import java.util.*;
 
 public interface RoomRepository extends JpaRepository<Room,Long> {
 
-    Room findByRoomID(int roomid);
+    Optional<Room> findByRoomID(int roomid);
 
 }
