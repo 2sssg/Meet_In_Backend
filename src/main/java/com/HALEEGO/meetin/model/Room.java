@@ -33,6 +33,9 @@ public class Room {
     @Column
     private String title;
 
+    @Column
+    private boolean isEnd = true;
+
     @ManyToOne(fetch = FetchType.LAZY , cascade = CascadeType.ALL)
     @JoinColumn(name = "HOSTUSER_ID")
     private User hostUSER;
