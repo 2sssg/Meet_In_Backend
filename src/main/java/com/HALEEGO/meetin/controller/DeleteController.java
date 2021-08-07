@@ -1,6 +1,7 @@
 package com.HALEEGO.meetin.controller;
 
 
+import com.HALEEGO.meetin.AOP.LogExecution;
 import com.HALEEGO.meetin.Constant.Enum.ErrorCode;
 import com.HALEEGO.meetin.Constant.FixedreturnValue;
 import com.HALEEGO.meetin.Exception.NoRoomIDException;
@@ -43,7 +44,6 @@ public class DeleteController {
     @RequestMapping("/delete/endroom/{roomid}")
     @Transactional
     public FixedreturnValue deleteGuest_Endroom(@PathVariable  int roomid){
-        log.info("endroom start" );
         List<User_has_Room> user_has_rooms = roomRepository.findByRoomID(roomid).orElse(null).getUsers();
         for(User_has_Room u : user_has_rooms) {
             if(u.getUser().getUserID()==null) {
@@ -73,8 +73,8 @@ public class DeleteController {
 
     @RequestMapping("/delete/deleteroom/{roomid}")
     @Transactional
+    @LogExecution
     public Object deleteRoom(@PathVariable int roomid){
-        log.info("deleteRoom start");
         Room room = roomRepository.findByRoomID(roomid).orElseThrow(()->
                 new NoRoomIDException("방을 못찾겠음 ㅠㅠ", ErrorCode.NOT_FOUND)
                 );
@@ -86,10 +86,7 @@ public class DeleteController {
             user_has_roomRepository.delete(u);
         }
         roomRepository.delete(room);
-        FixedreturnValue<Object> fixedreturnValue = new FixedreturnValue<>();
-        log.info("returnValue : "+ fixedreturnValue);
-        log.info("deleteRoom end");
-        return fixedreturnValue;
+        return new FixedreturnValue<>();
     }
 
 
@@ -97,8 +94,6 @@ public class DeleteController {
     @RequestMapping("delete/exituser")
     @Transactional
     public Object exituser(@RequestBody  JSONObject jsonObject){
-        log.info("exituser start");
-        jsonObject.forEach((k,v)->log.info(k+" : "+v));
         Long id = Long.parseLong(jsonObject.get("id").toString());
         int roomID = Integer.parseInt(jsonObject.get("roomID").toString());
         User_has_Room user_has_room = user_has_roomRepository.findByRoom_RoomIDAndUser_Id(roomID,id);

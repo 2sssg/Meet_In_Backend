@@ -1,6 +1,7 @@
 package com.HALEEGO.meetin.controller;
 
 
+import com.HALEEGO.meetin.AOP.LogExecution;
 import com.HALEEGO.meetin.Constant.Enum.ErrorCode;
 import com.HALEEGO.meetin.Constant.FixedreturnValue;
 import com.HALEEGO.meetin.DTO.RoomDTO;
@@ -29,8 +30,8 @@ public class UpdateController {
     @MessageMapping("/update/roomtitle")
     @RequestMapping("/update/roomtitle")
     @Transactional
+    @LogExecution
     public Object updateRoomTitle(@RequestBody Room room){
-        log.info("updateRommTile is start");
         roomRepository.findByRoomID(room.getRoomID()).orElseThrow(()->
                 new NoRoomIDException("roomID가 없는듯 ㅋㅋ",ErrorCode.NOT_FOUND)
                 ).setTitle(room.getTitle());
@@ -40,28 +41,21 @@ public class UpdateController {
                 .build();
         FixedreturnValue<RoomDTO> fixedreturnValue = new FixedreturnValue<>(roomDTO);
 
-        log.info("returnValue : "  + fixedreturnValue);
         messagingTemplate.convertAndSend("/topic/"+room.getRoomID()+"/update/roomtitle" ,fixedreturnValue);
-        log.info("updateRommTile is end");
         return fixedreturnValue;
     }
 
     @RequestMapping("update/roomend")
     @Transactional
+    @LogExecution
     public Object roomEnd(@RequestBody JSONObject jsonObject){
-        log.info("roomend is start");
-        jsonObject.forEach((k,v)-> log.info(k+" : "+v));
         int roomID = Integer.parseInt(jsonObject.get("roomID").toString());
         roomRepository.findByRoomID(roomID).orElseThrow(()->
            new NoRoomIDException("roomID가 없는듯 ㅋㅋ",ErrorCode.NOT_FOUND)
         ).setEnd(false);
 
-        FixedreturnValue<Object> fixedreturnValue = new FixedreturnValue<>();
-        log.info("returnValue : "+ fixedreturnValue);
-
-        return fixedreturnValue;
+        return new FixedreturnValue<>();
     }
 
-
-
 }
+

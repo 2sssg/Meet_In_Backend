@@ -2,6 +2,7 @@ package com.HALEEGO.meetin.controller.MeetController;
 
 import java.util.*;
 
+import com.HALEEGO.meetin.AOP.LogExecution;
 import com.HALEEGO.meetin.Constant.Enum.ErrorCode;
 import com.HALEEGO.meetin.Constant.Enum.MeetStep;
 import com.HALEEGO.meetin.Constant.FixedreturnValue;
@@ -43,11 +44,8 @@ public class SixhatController {
 
 
     @RequestMapping("/save/sixhatStep/{roomid}")
+    @LogExecution
     public Object SaveSix_hatStep(@PathVariable int roomid, @RequestBody ToolDTO toolDTO) { // sixhat단계마다 저장하기
-        log.info("saveSix_hatStep start");
-        log.info("toolDTO : "+toolDTO.toString());
-        log.info("meetStep : " + toolDTO.getSixhat().getMeetSTEP().toString());
-        log.info("postits : "+toolDTO.getPostits().toString());
         Sixhat sixhat;
         Tool tool;
         PostIt postIt;
@@ -63,7 +61,6 @@ public class SixhatController {
                 .sixhat(sixhat)
                 .build();
         for (PostItDTO postitDTOS :toolDTO.getPostits()){ // 포스트잇 리스트로 받은 것들 for문으로 포스트잇 하나씩 만들어서 저장
-            log.info("postitDTOS : " + postitDTOS.toString());
 
             postIt = PostIt.builder()
                     .height(postitDTOS.getHeight())
@@ -83,10 +80,7 @@ public class SixhatController {
         toolRepository.save(tool);
         sixhatRepository.save(sixhat);
 
-        FixedreturnValue<Object> fixedreturnValue = new FixedreturnValue<>();
-        log.info("returnValue : "+fixedreturnValue);
-        log.info("saveSix_hatStep end");
-        return fixedreturnValue;
+        return new FixedreturnValue<>();
     }
 
 
@@ -94,8 +88,8 @@ public class SixhatController {
     @MessageMapping(value = "/read/sixhat/whitehat/{roomid}")
     @Transactional
     @RequestMapping(value = "/read/sixhat/whitehat/{roomid}")
+    @LogExecution
     public Object returnWhitehat(@PathVariable("roomid") int roomid) { //whitehat일때 1~5단계 포스트잇 반환
-        log.info("whitehatRequirement start");
         JSONObject jsonObject = new JSONObject();
         for(Sixhat sixhat : roomRepository
                 .findByRoomID(roomid).orElseThrow(()->
@@ -107,19 +101,16 @@ public class SixhatController {
             }
             jsonObject.put(sixhat.getMeetSTEP().toString(),postItDTOS);
         }
-        log.info("whitehatRequirement end");
-        log.info("returnValue : "+ jsonObject.toString());
 
         FixedreturnValue<JSONObject> fixedreturnValue = new FixedreturnValue<>(jsonObject);
-        log.info("returnValue : "+fixedreturnValue);
         messagingTemplate.convertAndSend("/topic" + roomid + "/sixhat/whitehat/",fixedreturnValue); // 원래는 메세지 템플릿으로 전체 유저한테 보내줘야함 이거 주석풀기
         return fixedreturnValue; // 확인위해서 그냥 리턴
     }
 
     @Transactional
     @RequestMapping(value = "/read/sixhat/onestep/{meetStep}/{roomid}")
+    @LogExecution
     public Object returnWhitehat(@PathVariable("roomid") int roomid ,@PathVariable("meetStep") MeetStep meetStep) {
-        log.info(meetStep+"Requirement start");
         List<PostItDTO> postItDTOS = new ArrayList<>();
         for(Sixhat sixhat : roomRepository.findByRoomID(roomid).orElseThrow(
                 ()->new NoRoomIDException("룸 못찾겠음 ㅠㅠ 룸아이디 다시확인해봐"+roomid,ErrorCode.NOT_FOUND))
@@ -130,9 +121,6 @@ public class SixhatController {
                 postItDTOS.add(postit.toPostItDTO());
             }
         }
-        FixedreturnValue<List<PostItDTO>> fixedreturnValue = new FixedreturnValue<>(postItDTOS);
-        log.info("returnValue : "+ fixedreturnValue);
-        log.info(meetStep+"Requirement end");
-        return fixedreturnValue;
+        return new FixedreturnValue<List<PostItDTO>>(postItDTOS);
     }
 }

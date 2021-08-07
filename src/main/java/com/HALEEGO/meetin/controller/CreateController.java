@@ -1,13 +1,13 @@
 package com.HALEEGO.meetin.controller;
 
 
+import com.HALEEGO.meetin.AOP.LogExecution;
 import com.HALEEGO.meetin.Constant.Enum.ErrorCode;
 import com.HALEEGO.meetin.Constant.Enum.MeetStep;
 import com.HALEEGO.meetin.Constant.Enum.MeetType;
 import com.HALEEGO.meetin.Constant.Enum.Return;
 import com.HALEEGO.meetin.Constant.FixedreturnValue;
 import com.HALEEGO.meetin.DTO.RoomDTO;
-import com.HALEEGO.meetin.DTO.SixhatDTO;
 import com.HALEEGO.meetin.DTO.UserDTO;
 import com.HALEEGO.meetin.Exception.AlreadyHasUserID;
 import com.HALEEGO.meetin.Exception.AlreadyStartMeetException;
@@ -48,9 +48,9 @@ public class CreateController {
     @Autowired
     SixhatRepository sixhatRepository;
 
+    @LogExecution
     @RequestMapping(value = "/create/signup" , method = RequestMethod.POST)
     public Object signup(@RequestBody UserDTO userDTO){ //회원가입
-        log.info("signup start ");
         log.info("userID : "+userDTO.getUserID());
         log.info("userPW : "+userDTO.getUserPW());
         log.info("userNAME : "+userDTO.getUserNAME());
@@ -61,19 +61,15 @@ public class CreateController {
                 .build();
         try {
             userRepository.save(user);
-            FixedreturnValue<Object> fixedreturnValue = new FixedreturnValue<>();
-            log.info("returnValue : "+ fixedreturnValue);
-            log.info("signup success end");
-            return fixedreturnValue;
+            return new FixedreturnValue<>();
         }catch (Exception e){
               throw new AlreadyHasUserID("이미 있는 아이디입니다" , ErrorCode.DUPLICATE);
         }
     }
 
     @RequestMapping(value = "/create/createroom" , method = RequestMethod.POST)
+    @LogExecution
     public Object createRoom(@RequestBody JSONObject jsonObject) {
-        log.info("createRoom start");
-        jsonObject.forEach((k,v)->{ log.info(k+" : "+v); });
         Room room;
         Sixhat sixhat;
         Tool tool;
@@ -133,32 +129,25 @@ public class CreateController {
                         )
                         .meetType(MeetType.SIX_HAT)
                         .build();
-                log.info("createRoom Success end");
-                FixedreturnValue<RoomDTO> fixedreturnValue = new FixedreturnValue<>(roomDTO);
-                log.info("returnValue : " + fixedreturnValue);
-                return fixedreturnValue;
+                return new FixedreturnValue<RoomDTO>(roomDTO);
 
         }
-        log.info("createRoom fail end");
-        FixedreturnValue<Object> fixedreturnValue = new FixedreturnValue<>().builder()
+
+        return FixedreturnValue.builder()
                 .status(ErrorCode.NOT_FOUND.getStatus())
                 .message(ErrorCode.NOT_FOUND.getMessage())
                 .customMessage(Return.FAIL.toString())
                 .build();
-
-        log.info("returnValue : "+fixedreturnValue);
-        return fixedreturnValue;
     }
 
 
 //    @MessageMapping(value = "/save/enterroom")
     @RequestMapping(value = "/create/enterroom" , method = RequestMethod.POST)
     @Transactional
+    @LogExecution
     public Object enterRoom(@RequestBody JSONObject jsonObject) {
-        log.info("enterRoom start");
         RoomDTO roomDTO;
         User guestUser = new User();
-        jsonObject.forEach((k,v)->{log.info(k+" : "+v);});
 
         log.info(jsonObject.containsKey("id")?
                 jsonObject.get("id").toString():
@@ -215,11 +204,8 @@ public class CreateController {
                 .users(userDTOS)
                 .build();
 
-        FixedreturnValue<RoomDTO> fixedreturnValue = new FixedreturnValue<>(roomDTO);
         log.info("WebSocketReturnValue : "+userDTOS);
-        log.info("returnValue : "+ fixedreturnValue);
         messagingTemplate.convertAndSend("/topic/enterroom/"+roomid,userDTOS);
-        log.info("enterRoom success end");
-        return fixedreturnValue;
+        return new FixedreturnValue<RoomDTO>(roomDTO);
     }
 }
