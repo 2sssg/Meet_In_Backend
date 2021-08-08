@@ -159,6 +159,39 @@ public class CreateController {
                     .userNAME(jsonObject.get("userNAME").toString())
                     .build()
             );
+        }else{
+            int roomID = Integer.parseInt(jsonObject.get("roomID").toString());
+            Long id = Long.parseLong(jsonObject.get("id").toString());
+            if(user_has_roomRepository.findByRoom_RoomIDAndUser_Id(roomID, id).isPresent()){
+                Room room = roomRepository.findByRoomID(roomID).orElseThrow(() ->
+                            new NoRoomIDException("룸없음" , ErrorCode.NOT_FOUND)
+                        );
+                List<UserDTO> userDTOList = new ArrayList<>();
+                UserDTO userDTO = new UserDTO();
+                for(User_has_Room user_has_room : room.getUsers()){
+                    if(user_has_room.getUser().getId().equals(id)){
+                        userDTO.setUserNAME(user_has_room.getUser().getUserNAME());
+                    }
+                    userDTOList.add(
+                            UserDTO.builder()
+                            .userNAME(user_has_room.getUser().getUserNAME())
+                            .build()
+                    );
+                }
+                return new FixedreturnValue<RoomDTO>(
+                        RoomDTO.builder()
+                                .roomID(room.getRoomID())
+                                .title(room.getTitle())
+                                .hostUSER(
+                                        UserDTO.builder()
+                                                .userNAME(room.getHostUSER().getUserNAME())
+                                                .build()
+                                ).meetType(room.getMeetType())
+                                .userPARTICIPANT(userDTOList)
+                                .userME(userDTO)
+                                .build()
+                );
+            }
         }
         Long id = jsonObject.containsKey("id")?Long.parseLong(jsonObject.get("id").toString()):0L;
         int roomid = Integer.parseInt(jsonObject.get("roomID").toString());
@@ -183,13 +216,18 @@ public class CreateController {
         user_has_roomRepository.save(user_has_room);
         List<User_has_Room> users = user_has_roomRepository.findByRoom(room);
         List<UserDTO> userDTOS = new ArrayList<>();
+        UserDTO usermeDTO = new UserDTO();
+        JSONObject jsonObjects = new JSONObject();
         for(User_has_Room u : users){
+            if(u.getUser().getUserNAME().equals(user.getUserNAME())){
+                usermeDTO = UserDTO.builder()
+                        .userNAME(u.getUser().getUserNAME())
+                        .id(user.getId())
+                        .build();
+            }
             userDTOS.add(
                     UserDTO.builder()
                             .userNAME(u.getUser().getUserNAME())
-                            .id(
-                                    u.getUser().getUserNAME().equals(user.getUserNAME())?user.getId():0L
-                            )
                             .build()
             );
         }
@@ -201,7 +239,8 @@ public class CreateController {
                                 .userNAME(room.getHostUSER().getUserNAME())
                                 .build()
                 ).meetType(room.getMeetType())
-                .users(userDTOS)
+                .userPARTICIPANT(userDTOS)
+                .userME(usermeDTO)
                 .build();
 
         log.info("WebSocketReturnValue : "+userDTOS);
