@@ -11,5 +11,22 @@ public enum MeetStep {
     SEVENTH,
     EIGHTH,
     NINTH,
-    TENTH
+    TENTH;
+    public MeetStep meetstepnext(MeetStep meetStep){
+        switch(meetStep){
+            case FIRST: return SECOND;
+            case SECOND: return THIRD;
+            case THIRD: return FOURTH;
+            case FOURTH: return FIFTH;
+            case FIFTH: return SIXTH;
+            case SIXTH: return SEVENTH;
+            case SEVENTH: return EIGHTH;
+            case EIGHTH: return NINTH;
+            case NINTH: return TENTH;
+        }
+        return FIRST;
+    }
+
 }
+
+

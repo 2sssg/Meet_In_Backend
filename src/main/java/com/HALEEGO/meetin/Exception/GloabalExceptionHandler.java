@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 @RestControllerAdvice
 public class GloabalExceptionHandler {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CreateController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GloabalExceptionHandler.class);
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final NotFoundException e) {
@@ -30,6 +30,26 @@ public class GloabalExceptionHandler {
                         .build());
     }
 
+    @ExceptionHandler(NoRoomIDException.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final NoRoomIDException e) {
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ErrorResponse.builder()
+                        .status(e.getErrorCode().getStatus())
+                        .message(e.getErrorCode().getMessage())
+                        .customMessage(e.getCustomMessage())
+                        .build());
+    }
+    @ExceptionHandler(NoUserIdException.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final NoUserIdException e) {
+        return ResponseEntity
+                .status(e.getErrorCode().getStatus())
+                .body(ErrorResponse.builder()
+                        .status(e.getErrorCode().getStatus())
+                        .message(e.getErrorCode().getMessage())
+                        .customMessage(e.getCustomMessage())
+                        .build());
+    }
 
     @ExceptionHandler(InconsistencyException.class)
     public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final InconsistencyException e) {
@@ -51,6 +71,17 @@ public class GloabalExceptionHandler {
                         .status(404)
                         .message(e.getMessage())
                         .customMessage("알 수 없는 오류")
+                        .build());
+    }
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ErrorResponse> exceptionHandler(HttpServletRequest request, final NullPointerException e){
+        LOGGER.info(e.getMessage());
+        return ResponseEntity
+                .status(404)
+                .body(ErrorResponse.builder()
+                        .status(404)
+                        .message(e.getMessage())
+                        .customMessage("헤으응 null값이 튀어나와 버렷...! 그렇게 빈건 들어가지 않는다구...!")
                         .build());
     }
 

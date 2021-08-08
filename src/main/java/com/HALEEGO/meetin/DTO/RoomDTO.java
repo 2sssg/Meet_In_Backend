@@ -17,11 +17,17 @@ import java.util.*;
 public class RoomDTO {
     private Long id;
 
+    private String title;
+
     private int roomID;
 
     private UserDTO hostUSER;
 
     private MeetType meetType;
+
+    private UserDTO userME;
+
+    private List<UserDTO> userPARTICIPANT;
 
     private List<SixhatDTO> sixhats = new ArrayList<>();
 
