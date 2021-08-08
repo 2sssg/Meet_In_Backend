@@ -25,4 +25,5 @@ public class User_has_Room {
     @ManyToOne(fetch = FetchType.LAZY , cascade = CascadeType.ALL)
     @JoinColumn(name = "ROOM_ID")
     private Room room;
+
 }

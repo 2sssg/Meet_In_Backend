@@ -1,6 +1,6 @@
 package com.HALEEGO.meetin.model.ToolKind;
 
-import com.HALEEGO.meetin.model.MeetKind.Six_hat;
+import com.HALEEGO.meetin.model.MeetKind.Sixhat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,8 +20,8 @@ public class Tool {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY  , cascade = CascadeType.ALL)
-    @JoinColumn(name = "SIX_HAT_ID")
-    private Six_hat six_hat;
+    @JoinColumn(name = "SIXHAT_ID")
+    private Sixhat sixhat;
 
     @OneToMany(mappedBy = "tool" , cascade = CascadeType.ALL , fetch = FetchType.LAZY)
     private List<PostIt> postIts = new ArrayList<>();

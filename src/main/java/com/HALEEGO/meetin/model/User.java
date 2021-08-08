@@ -1,5 +1,6 @@
 package com.HALEEGO.meetin.model;
 
+import com.HALEEGO.meetin.model.ToolKind.PostIt;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -28,9 +29,11 @@ public class User {
     @Column(nullable = false , length = 20)
     private String userNAME;
 
-    @OneToMany(cascade = CascadeType.ALL , mappedBy = "user" , fetch = FetchType.LAZY)
+    @OneToMany( mappedBy = "user" , fetch = FetchType.LAZY)
     private List<User_has_Room> rooms = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL,mappedBy = "user" , fetch = FetchType.LAZY)
+    private List<PostIt> postits = new ArrayList<>();
 
 
 }
