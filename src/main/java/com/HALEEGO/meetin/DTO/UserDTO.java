@@ -10,6 +10,7 @@ import java.util.*;
 @NoArgsConstructor
 @ToString
 @Getter
+@Setter
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserDTO {
     private Long id;
