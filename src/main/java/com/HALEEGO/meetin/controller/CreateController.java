@@ -19,6 +19,8 @@ import com.HALEEGO.meetin.model.ToolKind.Tool;
 import com.HALEEGO.meetin.model.User;
 import com.HALEEGO.meetin.model.User_has_Room;
 import com.HALEEGO.meetin.repository.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
@@ -35,6 +37,7 @@ import java.util.*;
 @Slf4j
 public class CreateController {
 
+    ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private final SimpMessageSendingOperations messagingTemplate;
     @Autowired
@@ -145,7 +148,7 @@ public class CreateController {
     @RequestMapping(value = "/create/enterroom" , method = RequestMethod.POST)
     @Transactional
     @LogExecution
-    public Object enterRoom(@RequestBody JSONObject jsonObject) {
+    public Object enterRoom(@RequestBody JSONObject jsonObject) throws JsonProcessingException {
         RoomDTO roomDTO;
         User guestUser = new User();
 
@@ -160,6 +163,7 @@ public class CreateController {
                     .build()
             );
         }else{
+            log.info("이미 참가한 사용자입니다. DB저장없이 리턴만 해줍니당~ ");
             int roomID = Integer.parseInt(jsonObject.get("roomID").toString());
             Long id = Long.parseLong(jsonObject.get("id").toString());
             if(user_has_roomRepository.findByRoom_RoomIDAndUser_Id(roomID, id).isPresent()){
@@ -243,8 +247,16 @@ public class CreateController {
                 .userME(usermeDTO)
                 .build();
 
-        log.info("WebSocketReturnValue : "+userDTOS);
-        messagingTemplate.convertAndSend("/topic/enterroom/"+roomid,userDTOS);
+        log.info("WebSocketReturnValue : \n"+
+                objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(userDTOS));
+        messagingTemplate.convertAndSend(
+                "/topic/enterroom/"+roomid
+                ,new FixedreturnValue<UserDTO>(
+                        UserDTO.builder()
+                                .userNAME(user.getUserNAME())
+                                .build()
+                )
+        );
         return new FixedreturnValue<RoomDTO>(roomDTO);
     }
 }
