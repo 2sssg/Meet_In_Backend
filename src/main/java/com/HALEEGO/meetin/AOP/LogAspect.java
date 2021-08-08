@@ -7,6 +7,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 import java.util.Arrays;
 
@@ -18,7 +19,8 @@ public class LogAspect {
     @Around("@annotation(LogExecution)")
     public Object returnlog(ProceedingJoinPoint joinPoint) throws Throwable{
         ObjectMapper mapper = new ObjectMapper();
-
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         log.info("시작 : "+joinPoint.getSignature());
         log.info("입력값 : "+mapper.writerWithDefaultPrettyPrinter().writeValueAsString(joinPoint.getArgs()));
 
@@ -26,6 +28,8 @@ public class LogAspect {
 
         log.info("return Value : \n"+ mapper.writerWithDefaultPrettyPrinter().writeValueAsString(proceed));
         log.info("끝 : "+joinPoint.getSignature());
+        stopWatch.stop();
+        log.info(stopWatch.prettyPrint());
         return proceed;
     }
 
