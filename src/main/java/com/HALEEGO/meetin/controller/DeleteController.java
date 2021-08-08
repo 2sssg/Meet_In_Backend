@@ -91,20 +91,20 @@ public class DeleteController {
 
 
 
-    @RequestMapping("delete/exituser")
-    @Transactional
-    public Object exituser(@RequestBody  JSONObject jsonObject){
-        Long id = Long.parseLong(jsonObject.get("id").toString());
-        int roomID = Integer.parseInt(jsonObject.get("roomID").toString());
-        User_has_Room user_has_room = user_has_roomRepository.findByRoom_RoomIDAndUser_Id(roomID,id);
-        user_has_room.setRoom(null);
-        if(user_has_room.getUser().getUserID() != null){
-            user_has_room.setUser(null);
-        }
-        user_has_roomRepository.delete(user_has_room);
-
-        return null;
-    }
+//    @RequestMapping("delete/exituser")
+//    @Transactional
+//    public Object exituser(@RequestBody  JSONObject jsonObject){
+//        Long id = Long.parseLong(jsonObject.get("id").toString());
+//        int roomID = Integer.parseInt(jsonObject.get("roomID").toString());
+////        User_has_Room user_has_room = user_has_roomRepository.findByRoom_RoomIDAndUser_Id(roomID,id);
+//        user_has_room.setRoom(null);
+//        if(user_has_room.getUser().getUserID() != null){
+//            user_has_room.setUser(null);
+//        }
+//        user_has_roomRepository.delete(user_has_room);
+//
+//        return null;
+//    }
 
     //////////////////////////////////////이것도 안쓸거임/////////////////////////////////////////
 
