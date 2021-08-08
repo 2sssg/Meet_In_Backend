@@ -11,7 +11,7 @@ public interface User_has_RoomRepository extends JpaRepository<User_has_Room,Lon
 
     List<User_has_Room> findByRoom(Room room);
 
-    User_has_Room findByRoom_RoomIDAndUser_Id(int roomid, Long id);
+    Optional<User_has_Room> findByRoom_RoomIDAndUser_Id(int roomid, Long id);
 
     void deleteByRoom_RoomIDAndUser_Id(int roomid, Long id);
 }

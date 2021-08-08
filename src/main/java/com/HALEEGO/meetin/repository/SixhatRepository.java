@@ -8,4 +8,5 @@ import java.util.*;
 public interface SixhatRepository extends JpaRepository<Sixhat,Long> {
 
     List<Sixhat> findByRoom(Room room);
+    List<Sixhat> findByRoom_RoomID(int roomID);
 }
