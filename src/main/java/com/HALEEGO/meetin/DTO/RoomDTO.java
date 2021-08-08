@@ -25,6 +25,10 @@ public class RoomDTO {
 
     private MeetType meetType;
 
+    private UserDTO userME;
+
+    private List<UserDTO> userPARTICIPANT;
+
     private List<SixhatDTO> sixhats = new ArrayList<>();
 
     private List<UserDTO> users = new ArrayList<>();
