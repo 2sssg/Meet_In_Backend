@@ -8,7 +8,6 @@ import com.HALEEGO.meetin.Constant.Enum.MeetStep;
 import com.HALEEGO.meetin.Constant.FixedreturnValue;
 import com.HALEEGO.meetin.DTO.PostItDTO;
 import com.HALEEGO.meetin.DTO.ToolDTO;
-import com.HALEEGO.meetin.DTO.UserDTO;
 import com.HALEEGO.meetin.Exception.NoRoomIDException;
 import com.HALEEGO.meetin.Exception.NoUserIdException;
 import com.HALEEGO.meetin.model.MeetKind.Sixhat;
@@ -122,5 +121,22 @@ public class SixhatController {
             }
         }
         return new FixedreturnValue<List<PostItDTO>>(postItDTOS);
+    }
+
+
+    @RequestMapping("/read/sixhat/allstep")
+    @LogExecution
+    @Transactional
+    public Object readAllStep(@RequestBody JSONObject jsonObject){
+        int roomID = Integer.parseInt(jsonObject.get("roomID").toString());
+        JSONObject jsonObject1 = new JSONObject();
+        List<Sixhat> sixhats = sixhatRepository.findByRoom_RoomID(roomID);
+        for(Sixhat sixhat : sixhats){
+            List<PostItDTO> postItDTOS = new ArrayList<>();
+            if(sixhat.getMeetSTEP().equals(MeetStep.BEFORE_START)) continue;
+            postitRepository.findByTool_Sixhat(sixhat).forEach(p-> postItDTOS.add(p.toPostItDTO()));
+            jsonObject1.put(sixhat.getMeetSTEP().toString(),postItDTOS);
+        }
+        return new FixedreturnValue<JSONObject>(jsonObject1);
     }
 }
