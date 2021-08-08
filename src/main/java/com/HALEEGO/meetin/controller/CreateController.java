@@ -132,7 +132,10 @@ public class CreateController {
                         )
                         .meetType(MeetType.SIX_HAT)
                         .build();
-                return new FixedreturnValue<RoomDTO>(roomDTO);
+                return new FixedreturnValue<>(roomDTO);
+
+            case MIND_MAP:
+                return new FixedreturnValue<>();
 
         }
 
@@ -182,7 +185,7 @@ public class CreateController {
                             .build()
                     );
                 }
-                return new FixedreturnValue<RoomDTO>(
+                return new FixedreturnValue<>(
                         RoomDTO.builder()
                                 .roomID(room.getRoomID())
                                 .title(room.getTitle())
@@ -207,10 +210,10 @@ public class CreateController {
 
         switch (room.getMeetType()){
             case SIX_HAT:
-                List<Sixhat> sixhats =  sixhatRepository.findByRoom(room);
                 if(sixhatRepository.findByRoom(room).size() != 1){
                     throw new AlreadyStartMeetException("이미 방이 시작됐습니다. ", ErrorCode.DUPLICATE);
                 }
+            case MIND_MAP:
         }
         User_has_Room user_has_room =
                 User_has_Room.builder()
@@ -220,11 +223,10 @@ public class CreateController {
         user_has_roomRepository.save(user_has_room);
         List<User_has_Room> users = user_has_roomRepository.findByRoom(room);
         List<UserDTO> userDTOS = new ArrayList<>();
-        UserDTO usermeDTO = new UserDTO();
-        JSONObject jsonObjects = new JSONObject();
+        UserDTO userme = new UserDTO();
         for(User_has_Room u : users){
             if(u.getUser().getUserNAME().equals(user.getUserNAME())){
-                usermeDTO = UserDTO.builder()
+                userme = UserDTO.builder()
                         .userNAME(u.getUser().getUserNAME())
                         .id(user.getId())
                         .build();
@@ -244,19 +246,23 @@ public class CreateController {
                                 .build()
                 ).meetType(room.getMeetType())
                 .userPARTICIPANT(userDTOS)
-                .userME(usermeDTO)
+                .userME(userme)
                 .build();
 
         log.info("WebSocketReturnValue : \n"+
-                objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(userDTOS));
+                objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(new FixedreturnValue<>(
+                        UserDTO.builder()
+                                .userNAME(user.getUserNAME())
+                                .build()
+                )));
         messagingTemplate.convertAndSend(
                 "/topic/enterroom/"+roomid
-                ,new FixedreturnValue<UserDTO>(
+                , new FixedreturnValue<>(
                         UserDTO.builder()
                                 .userNAME(user.getUserNAME())
                                 .build()
                 )
         );
-        return new FixedreturnValue<RoomDTO>(roomDTO);
+        return new FixedreturnValue<>(roomDTO);
     }
 }

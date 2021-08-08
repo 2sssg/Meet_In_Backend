@@ -120,7 +120,7 @@ public class SixhatController {
                 postItDTOS.add(postit.toPostItDTO());
             }
         }
-        return new FixedreturnValue<List<PostItDTO>>(postItDTOS);
+        return new FixedreturnValue<>(postItDTOS);
     }
 
 
@@ -137,6 +137,6 @@ public class SixhatController {
             postitRepository.findByTool_Sixhat(sixhat).forEach(p-> postItDTOS.add(p.toPostItDTO()));
             jsonObject1.put(sixhat.getMeetSTEP().toString(),postItDTOS);
         }
-        return new FixedreturnValue<JSONObject>(jsonObject1);
+        return new FixedreturnValue<>(jsonObject1);
     }
 }

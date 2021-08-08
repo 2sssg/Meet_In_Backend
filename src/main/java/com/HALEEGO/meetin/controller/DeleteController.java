@@ -12,12 +12,9 @@ import com.HALEEGO.meetin.model.User_has_Room;
 import com.HALEEGO.meetin.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.*;
@@ -26,8 +23,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Slf4j
 public class DeleteController {
-    @Autowired
-    private final SimpMessageSendingOperations messagingTemplate;
+//    @Autowired
+//    private final SimpMessageSendingOperations messagingTemplate;
 
     @Autowired
     User_has_RoomRepository user_has_roomRepository;
@@ -43,8 +40,10 @@ public class DeleteController {
 
     @RequestMapping("/delete/endroom/{roomid}")
     @Transactional
-    public FixedreturnValue deleteGuest_Endroom(@PathVariable  int roomid){
-        List<User_has_Room> user_has_rooms = roomRepository.findByRoomID(roomid).orElse(null).getUsers();
+    public Object deleteGuest_Endroom(@PathVariable  int roomid){
+        List<User_has_Room> user_has_rooms = roomRepository.findByRoomID(roomid).orElseThrow(
+                () -> new NoRoomIDException("룸 id가 없쪙 ㅠㅠ" , ErrorCode.NOT_FOUND)
+        ).getUsers();
         for(User_has_Room u : user_has_rooms) {
             if(u.getUser().getUserID()==null) {
                 log.info("여기 들어오긴함");
@@ -52,7 +51,7 @@ public class DeleteController {
                 user_has_roomRepository.delete(u);
                 user.getRooms().remove(u.getRoom());
                 if(!user.getPostits().isEmpty()){
-                    log.info("if문 : " + String.valueOf(user.getPostits().size()));
+                    log.info("if문 : " + user.getPostits().size());
                     for(PostIt p : user.getPostits()){
                         p.setUser(null);
                     }
@@ -63,7 +62,7 @@ public class DeleteController {
             }
         }
         log.info("enterRoom end");
-        return new FixedreturnValue();
+        return new FixedreturnValue<>();
     }
 ////////////////////////////안쓸거임//////////////////////////////////////
 
