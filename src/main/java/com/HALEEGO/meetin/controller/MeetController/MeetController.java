@@ -44,10 +44,15 @@ public class MeetController {
     @LogExecution
     public Object movenextstep(JSONObject jsonObject, @DestinationVariable("roomid") int roomID ){// 다음단계로 넘어가는 웹소켓팅
         MeetStep meetStep = MeetStep.valueOf(jsonObject.get("meetStep").toString());
-        FixedreturnValue<MeetStep> fixedreturnValue = new FixedreturnValue<>(meetStep.meetstepnext(meetStep));
-        messagingTemplate.convertAndSend("/topic/move/nextstep"+roomID, fixedreturnValue);
+        Map<String , MeetStep> stringMeetStepHashMap = new HashMap<>();
+        stringMeetStepHashMap.put("meetStep" , meetStep.meetstepnext());
+
+        FixedreturnValue<Map<String,MeetStep>> fixedreturnValue = new FixedreturnValue<>(stringMeetStepHashMap);
+
+        messagingTemplate.convertAndSend("/topic/move/nextstep"+roomID, stringMeetStepHashMap);
         return fixedreturnValue;
     }
 
 }
+
 
