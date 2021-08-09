@@ -1,5 +1,6 @@
 package com.HALEEGO.meetin.controller.MeetController;
 
+import com.HALEEGO.meetin.Constant.Enum.MeetStep;
 import com.HALEEGO.meetin.Constant.FixedreturnValue;
 import com.HALEEGO.meetin.DTO.UserDTO;
 import com.HALEEGO.meetin.model.User;
@@ -16,5 +17,12 @@ class MeetControllerTest {
     public void test(){
         UserDTO u = new UserDTO();
         log.info(new FixedreturnValue<UserDTO>(u).toString());
+    }
+
+
+    @Test
+    public void ttest(){
+        MeetStep meetStep = MeetStep.FIRST;
+        log.info(meetStep.meetstepnext().toString());
     }
 }
