@@ -34,6 +34,8 @@ public class PostItDTO {
     private Enum<Color> postitCOLOR;
 
     private ToolDTO tool;
+    
+    private String roomID;
 
     public void setPostitCOLOR(String postitCOLOR) {
         this.postitCOLOR = Color.valueOf(postitCOLOR);

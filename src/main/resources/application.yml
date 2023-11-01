@@ -1,21 +1,24 @@
 spring:
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/Meet_In?serverTimezone=Asia/Seoul
+    url: jdbc:h2:mem:test;MODE=MySQL;NON_KEYWORDS=USER
+    driver-class-name: org.h2.Driver
     username: dmswl
     password: dmswl0818
-
+  sql:
+    init:
+      mode: always
+  h2:
+    console:
+      enabled: true
   jpa:
     open-in-view: true
     hibernate:
-      ddl-auto: update
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-      use-new-id-generator-mappings: false
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate.format_sql: true
     generate-ddl: true
+    defer-datasource-initialization: true
 
 
 

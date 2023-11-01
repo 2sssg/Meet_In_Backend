@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import java.util.*;
@@ -30,20 +31,22 @@ public class MeetController {
     @Autowired
     UserRepository userRepository;
 
-    @MessageMapping("/move/postit/{roomid}")
+    @MessageMapping("/move/postit")
     @LogExecution
-    public Object movepostit(List<PostItDTO> postItDTO  , @PathParam("roomid") int roomID ){ //포스트잇 웹소켓팅
+    public Object movepostit(@RequestBody List<PostItDTO> postItDTO){ //포스트잇 웹소켓팅
         FixedreturnValue<List<PostItDTO>> fixedreturnValue = new FixedreturnValue<>(postItDTO);
-        messagingTemplate.convertAndSend("/topic/move/postit"+roomID , fixedreturnValue);
+        String roomId = postItDTO.get(0).getRoomID();
+        messagingTemplate.convertAndSend("/topic/move/postit/"+roomId , fixedreturnValue);
         return fixedreturnValue;
     }
 
-    @MessageMapping("/move/nextstep/{roomid}")
+    @MessageMapping("/move/nextstep") // 버튼 (front/app/move/nextstep)
     @LogExecution
-    public Object movenextstep(JSONObject jsonObject, @PathParam("roomid") int roomID ){// 다음단계로 넘어가는 웹소켓팅
+    public Object movenextstep(JSONObject jsonObject){// 다음단계로 넘어가는 웹소켓팅
         MeetStep meetStep = MeetStep.valueOf(jsonObject.get("meetStep").toString());
         FixedreturnValue<MeetStep> fixedreturnValue = new FixedreturnValue<>(meetStep.meetstepnext(meetStep));
-        messagingTemplate.convertAndSend("/topic/move/nextstep"+roomID, fixedreturnValue);
+        // "/topic/move/nextstep/"+jsonObject.get("roomID").toString() room에 대해서 브로드 캐스팅
+        messagingTemplate.convertAndSend("/topic/move/nextstep/"+jsonObject.get("roomID").toString(), fixedreturnValue);
         return fixedreturnValue;
     }
 
